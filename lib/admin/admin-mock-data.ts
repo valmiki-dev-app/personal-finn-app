@@ -573,6 +573,166 @@ export const subscriptionOverTime: import('./admin-types').SubscriptionDataPoint
   return { date: m, premium, trial, free: total - premium - trial }
 })
 
+// ─── Per-user detail data ────────────────────────────────────────────────────
+
+import type { UserTransaction, UserCategory, ChatMessage, UserUsageStats } from './admin-types'
+
+function makeUserTransactions(userId: string, count: number): UserTransaction[] {
+  const cats = [
+    { name: 'Продукты', icon: '🛒', type: 'expense' as const },
+    { name: 'Кафе', icon: '☕', type: 'expense' as const },
+    { name: 'Транспорт', icon: '🚌', type: 'expense' as const },
+    { name: 'Развлечения', icon: '🎬', type: 'expense' as const },
+    { name: 'Здоровье', icon: '💊', type: 'expense' as const },
+    { name: 'Зарплата', icon: '💳', type: 'income' as const },
+    { name: 'Фриланс', icon: '💻', type: 'income' as const },
+    { name: 'Коммуналка', icon: '🏠', type: 'expense' as const },
+  ]
+  const messages = [
+    'кофе в surf 250', 'продукты пятёрочка 1200', 'метро 50', 'кино 450',
+    'аптека 380', 'зарплата 75000', 'фриланс проект 15000', 'свет газ 3200',
+    'ужин в кафе 980', 'такси 320', 'супермаркет 2100', 'спортзал 3000',
+  ]
+  return Array.from({ length: count }, (_, i) => {
+    const cat = cats[i % cats.length]
+    const isIncome = cat.type === 'income'
+    const amount = isIncome
+      ? 15000 + Math.round(Math.random() * 60000)
+      : 100 + Math.round(Math.random() * 4000)
+    return {
+      id: `${userId}-tx-${i}`,
+      date: new Date(now.getTime() - i * 18 * 60 * 60 * 1000),
+      description: cat.name,
+      category: cat.name,
+      amount,
+      type: cat.type,
+      rawMessage: messages[i % messages.length],
+      aiConfidence: 0.72 + Math.random() * 0.27,
+    }
+  })
+}
+
+function makeUserCategories(userId: string): UserCategory[] {
+  return [
+    { id: `${userId}-c1`, name: 'Продукты',      icon: '🛒', color: '#6BAA75', transactionCount: 42, totalAmount: 52400, type: 'expense', createdAt: new Date(now.getTime() - 80*86400000) },
+    { id: `${userId}-c2`, name: 'Кафе',           icon: '☕', color: '#D6A85A', transactionCount: 28, totalAmount: 18700, type: 'expense', createdAt: new Date(now.getTime() - 79*86400000) },
+    { id: `${userId}-c3`, name: 'Транспорт',      icon: '🚌', color: '#6F5E53', transactionCount: 61, totalAmount: 9200,  type: 'expense', createdAt: new Date(now.getTime() - 78*86400000) },
+    { id: `${userId}-c4`, name: 'Развлечения',    icon: '🎬', color: '#E3807C', transactionCount: 14, totalAmount: 8900,  type: 'expense', createdAt: new Date(now.getTime() - 60*86400000) },
+    { id: `${userId}-c5`, name: 'Зарплата',       icon: '💳', color: '#6BAA75', transactionCount:  3, totalAmount: 225000,type: 'income',  createdAt: new Date(now.getTime() - 80*86400000) },
+    { id: `${userId}-c6`, name: 'Фриланс',        icon: '💻', color: '#6BAA75', transactionCount:  8, totalAmount: 92000, type: 'income',  createdAt: new Date(now.getTime() - 55*86400000) },
+    { id: `${userId}-c7`, name: 'Коммуналка',     icon: '🏠', color: '#7A6F68', transactionCount:  3, totalAmount: 9600,  type: 'expense', createdAt: new Date(now.getTime() - 80*86400000) },
+    { id: `${userId}-c8`, name: 'Здоровье',       icon: '💊', color: '#D6A85A', transactionCount:  7, totalAmount: 4200,  type: 'expense', createdAt: new Date(now.getTime() - 40*86400000) },
+  ]
+}
+
+function makeUserChat(userId: string, userName: string): ChatMessage[] {
+  const pairs: Array<{ userText: string; botText: string; txData?: ChatMessage['parsedTransaction']; msgType?: ChatMessage['messageType'] }> = [
+    {
+      userText: 'кофе в surf 250',
+      botText: '✅ Записал: Кафе — 250 ₽',
+      txData: { category: 'Кафе', amount: 250, type: 'expense' },
+      msgType: 'transaction',
+    },
+    {
+      userText: 'зарплата 75000',
+      botText: '✅ Записал: Зарплата +75 000 ₽',
+      txData: { category: 'Зарплата', amount: 75000, type: 'income' },
+      msgType: 'transaction',
+    },
+    {
+      userText: 'продукты пятёрочка 1200',
+      botText: '✅ Записал: Продукты — 1 200 ₽',
+      txData: { category: 'Продукты', amount: 1200, type: 'expense' },
+      msgType: 'transaction',
+    },
+    {
+      userText: 'купил что-то в магазине',
+      botText: 'Уточни, пожалуйста: это расход на продукты или что-то другое? И на какую сумму?',
+      msgType: 'clarification',
+    },
+    {
+      userText: 'продукты, 850 руб',
+      botText: '✅ Записал: Продукты — 850 ₽',
+      txData: { category: 'Продукты', amount: 850, type: 'expense' },
+      msgType: 'transaction',
+    },
+    {
+      userText: '/report',
+      botText: 'Вот твой отчёт за неделю:\n\n💸 Расходы: 8 450 ₽\n💰 Доходы: 75 000 ₽\n📊 Топ категория: Продукты (3 200 ₽)\n\nЭкономишь на 12% больше, чем на прошлой неделе.',
+      msgType: 'report',
+    },
+    {
+      userText: 'такси 320',
+      botText: '✅ Записал: Транспорт — 320 ₽',
+      txData: { category: 'Транспорт', amount: 320, type: 'expense' },
+      msgType: 'transaction',
+    },
+    {
+      userText: 'спасибо, всё понятно',
+      botText: 'Всегда рад помочь! Просто пиши сколько потратил или получил, я всё запишу.',
+      msgType: 'text',
+    },
+  ]
+  const messages: ChatMessage[] = []
+  pairs.forEach((p, i) => {
+    const base = now.getTime() - (pairs.length - i) * 4 * 60 * 60 * 1000
+    messages.push({
+      id: `${userId}-msg-u-${i}`,
+      sender: 'user',
+      text: p.userText,
+      timestamp: new Date(base),
+      messageType: 'text',
+    })
+    messages.push({
+      id: `${userId}-msg-b-${i}`,
+      sender: 'bot',
+      text: p.botText,
+      timestamp: new Date(base + 4000),
+      isAiParsed: !!p.txData,
+      parsedTransaction: p.txData,
+      messageType: p.msgType,
+    })
+  })
+  return messages
+}
+
+function makeUserUsageStats(user: AdminUser): UserUsageStats {
+  const totalIncome  = 317000
+  const totalExpense = 102300
+  return {
+    avgTransactionsPerWeek: Math.round(user.transactionCount / Math.max(1, Math.round((now.getTime() - user.joinDate.getTime()) / 604800000))),
+    mostActiveHour: 20,
+    mostActiveDay: 'Вторник',
+    topCategory: 'Продукты',
+    topCategoryAmount: 52400,
+    streakDays: user.activityLevel === 'high' ? 14 : user.activityLevel === 'medium' ? 5 : 1,
+    totalCategories: 8,
+    totalIncome,
+    totalExpense,
+    netBalance: totalIncome - totalExpense,
+  }
+}
+
+// Cached per-user data maps (keyed by userId)
+export function getUserTransactions(userId: string): UserTransaction[] {
+  const user = adminUsers.find(u => u.id === userId)
+  return makeUserTransactions(userId, user?.transactionCount ?? 20)
+}
+
+export function getUserCategories(userId: string): UserCategory[] {
+  return makeUserCategories(userId)
+}
+
+export function getUserChat(userId: string): ChatMessage[] {
+  const user = adminUsers.find(u => u.id === userId)
+  return makeUserChat(userId, user?.name ?? 'Пользователь')
+}
+
+export function getUserUsageStats(userId: string): UserUsageStats {
+  const user = adminUsers.find(u => u.id === userId)!
+  return makeUserUsageStats(user)
+}
+
 // Helper function to get user by ID
 export function getAdminUserById(id: string): AdminUser | undefined {
   return adminUsers.find(u => u.id === id)

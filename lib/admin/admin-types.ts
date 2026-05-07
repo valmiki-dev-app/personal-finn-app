@@ -150,3 +150,60 @@ export interface SubscriptionDataPoint {
   trial: number
   premium: number
 }
+
+// Single transaction on a user profile
+export interface UserTransaction {
+  id: string
+  date: Date
+  description: string
+  category: string
+  amount: number
+  type: 'income' | 'expense'
+  rawMessage: string        // original Telegram message the user sent
+  aiConfidence: number      // 0–1
+}
+
+// A custom category created by the user
+export interface UserCategory {
+  id: string
+  name: string
+  icon: string              // emoji
+  color: string             // hex
+  transactionCount: number
+  totalAmount: number
+  type: 'income' | 'expense' | 'both'
+  createdAt: Date
+}
+
+// One message in the Telegram chat history
+export type ChatSender = 'user' | 'bot'
+
+export interface ChatMessage {
+  id: string
+  sender: ChatSender
+  text: string
+  timestamp: Date
+  // only on bot messages
+  isAiParsed?: boolean
+  parsedTransaction?: {
+    category: string
+    amount: number
+    type: 'income' | 'expense'
+  }
+  // message type for UI rendering
+  messageType?: 'text' | 'transaction' | 'report' | 'clarification' | 'admin'
+}
+
+// Per-user usage stats (for the Overview tab)
+export interface UserUsageStats {
+  avgTransactionsPerWeek: number
+  mostActiveHour: number       // 0–23
+  mostActiveDay: string
+  topCategory: string
+  topCategoryAmount: number
+  streakDays: number
+  totalCategories: number
+  totalIncome: number
+  totalExpense: number
+  netBalance: number
+}
