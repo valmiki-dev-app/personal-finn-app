@@ -496,6 +496,83 @@ export const funnelSteps: FunnelStep[] = [
   },
 ]
 
+// ─── Growth data ────────────────────────────────────────────────────────────
+
+const months = ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек']
+export const userGrowthMonthly: import('./admin-types').GrowthDataPoint[] = months.map((m, i) => {
+  const newU = 40 + Math.round(Math.sin(i * 0.6) * 20 + i * 28 + Math.random() * 30)
+  return { date: m, newUsers: newU, totalUsers: 200 + i * 95 + newU }
+})
+
+export const userGrowthWeekly: import('./admin-types').GrowthDataPoint[] = Array.from({ length: 12 }, (_, i) => {
+  const newU = 12 + Math.round(Math.sin(i * 0.9) * 8 + i * 7 + Math.random() * 12)
+  return { date: `Нед ${i + 1}`, newUsers: newU, totalUsers: 900 + i * 28 + newU }
+})
+
+// ─── Hourly activity heatmap ────────────────────────────────────────────────
+
+const DAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
+export const hourlyActivity: import('./admin-types').HourlyActivityRow[] = DAYS.map((day, di) => ({
+  day,
+  hours: Array.from({ length: 24 }, (_, h) => {
+    // Peak usage: morning 8-10, lunch 12-14, evening 19-22
+    const isMorning = h >= 8 && h <= 10
+    const isLunch   = h >= 12 && h <= 14
+    const isEvening = h >= 19 && h <= 22
+    const isWeekend = di >= 5
+    const base = isEvening ? 80 : isMorning ? 60 : isLunch ? 50 : 10
+    const weekendMult = isWeekend ? 0.6 : 1
+    return Math.max(0, Math.round((base + Math.random() * 30) * weekendMult))
+  }),
+}))
+
+// ─── Feature adoption ────────────────────────────────────────────────────────
+
+export const featureAdoption: import('./admin-types').FeatureAdoption[] = [
+  { feature: 'Добавление транзакций',    users: 1220, percentage: 98, trend: 'stable' },
+  { feature: 'Просмотр аналитики',       users:  780, percentage: 63, trend: 'up'     },
+  { feature: 'Категории',                users:  645, percentage: 52, trend: 'up'     },
+  { feature: 'Еженедельные отчёты',      users:  460, percentage: 37, trend: 'up'     },
+  { feature: 'Лимиты расходов',          users:  285, percentage: 23, trend: 'stable' },
+  { feature: 'Экспорт данных',           users:  152, percentage: 12, trend: 'down'   },
+  { feature: 'Поиск по транзакциям',     users:   98, percentage:  8, trend: 'down'   },
+]
+
+// ─── Daily transaction volume ────────────────────────────────────────────────
+
+export const dailyVolume: import('./admin-types').DailyVolume[] = Array.from({ length: 30 }, (_, i) => {
+  const d = new Date(now.getTime() - (29 - i) * 86400000)
+  const isWeekend = d.getDay() === 0 || d.getDay() === 6
+  const base = isWeekend ? 650 : 1100
+  const tx = base + Math.round(Math.random() * 400 - 200 + i * 8)
+  return {
+    date: d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }),
+    transactions: tx,
+    income:  Math.round(tx * (0.3 + Math.random() * 0.15) * 2500),
+    expense: Math.round(tx * (0.5 + Math.random() * 0.15) * 1800),
+  }
+})
+
+// ─── Churn reasons ───────────────────────────────────────────────────────────
+
+export const churnReasons: import('./admin-types').ChurnReason[] = [
+  { reason: 'Неудобно добавлять вручную',    count: 38, percentage: 34 },
+  { reason: 'Нашёл другое приложение',       count: 24, percentage: 21 },
+  { reason: 'Слишком много уведомлений',     count: 19, percentage: 17 },
+  { reason: 'Не понял как пользоваться',     count: 15, percentage: 13 },
+  { reason: 'Цена за Premium',               count: 11, percentage: 10 },
+  { reason: 'Другое',                        count:  6, percentage:  5 },
+]
+
+// ─── Subscription over time ───────────────────────────────────────────────────
+
+export const subscriptionOverTime: import('./admin-types').SubscriptionDataPoint[] = months.map((m, i) => {
+  const total = 200 + i * 95
+  const premium = Math.round(total * (0.10 + i * 0.018))
+  const trial   = Math.round(total * (0.08 + i * 0.005))
+  return { date: m, premium, trial, free: total - premium - trial }
+})
+
 // Helper function to get user by ID
 export function getAdminUserById(id: string): AdminUser | undefined {
   return adminUsers.find(u => u.id === id)

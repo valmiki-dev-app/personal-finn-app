@@ -106,3 +106,47 @@ export interface FunnelStep {
   users: number
   percentage: number
 }
+
+// Daily/weekly/monthly user growth point
+export interface GrowthDataPoint {
+  date: string        // formatted label: "Янв", "Нед 1", "01.05"
+  newUsers: number
+  totalUsers: number
+}
+
+// Hour-of-day activity heatmap row (one per day-of-week)
+export interface HourlyActivityRow {
+  day: string         // "Пн", "Вт", …, "Вс"
+  hours: number[]     // 24 values — messages count per hour
+}
+
+// Feature adoption item
+export interface FeatureAdoption {
+  feature: string
+  users: number
+  percentage: number
+  trend: 'up' | 'down' | 'stable'
+}
+
+// Daily transaction volume
+export interface DailyVolume {
+  date: string
+  transactions: number
+  income: number
+  expense: number
+}
+
+// Churn reason
+export interface ChurnReason {
+  reason: string
+  count: number
+  percentage: number
+}
+
+// Subscription conversion over time
+export interface SubscriptionDataPoint {
+  date: string
+  free: number
+  trial: number
+  premium: number
+}
