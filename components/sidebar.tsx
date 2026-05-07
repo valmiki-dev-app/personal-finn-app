@@ -9,7 +9,8 @@ import {
   BarChart3, 
   Settings,
   MessageCircle,
-  Check
+  Check,
+  Shield
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -23,6 +24,7 @@ const navItems = [
   { href: '/transactions', label: 'Транзакции', icon: ArrowRightLeft },
   { href: '/analytics', label: 'Аналитика', icon: BarChart3 },
   { href: '/settings', label: 'Настройки', icon: Settings },
+  { href: '/admin', label: 'Admin Panel', icon: Shield },
 ]
 
 export function Sidebar({ collapsed, onToggle }: SidebarProps) {
