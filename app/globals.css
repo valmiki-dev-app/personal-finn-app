@@ -142,6 +142,50 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* ─── Accent color themes ────────────────────────────────────────────────── */
+/* default = terracotta (built into :root above) */
+
+[data-accent="ocean"] {
+  --primary: #4A90D9;
+  --primary-foreground: #FFFFFF;
+  --ring: #4A90D9;
+  --sidebar-primary: #4A90D9;
+  --sidebar-ring: #4A90D9;
+  --chart-1: #4A90D9;
+}
+[data-accent="forest"] {
+  --primary: #4E9B6A;
+  --primary-foreground: #FFFFFF;
+  --ring: #4E9B6A;
+  --sidebar-primary: #4E9B6A;
+  --sidebar-ring: #4E9B6A;
+  --chart-1: #4E9B6A;
+}
+[data-accent="amber"] {
+  --primary: #C98B2E;
+  --primary-foreground: #FFFFFF;
+  --ring: #C98B2E;
+  --sidebar-primary: #C98B2E;
+  --sidebar-ring: #C98B2E;
+  --chart-1: #C98B2E;
+}
+[data-accent="slate"] {
+  --primary: #5B6A7E;
+  --primary-foreground: #FFFFFF;
+  --ring: #5B6A7E;
+  --sidebar-primary: #5B6A7E;
+  --sidebar-ring: #5B6A7E;
+  --chart-1: #5B6A7E;
+}
+[data-accent="rose"] {
+  --primary: #C0485B;
+  --primary-foreground: #FFFFFF;
+  --ring: #C0485B;
+  --sidebar-primary: #C0485B;
+  --sidebar-ring: #C0485B;
+  --chart-1: #C0485B;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

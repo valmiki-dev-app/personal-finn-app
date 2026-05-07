@@ -194,7 +194,31 @@ export interface ChatMessage {
   messageType?: 'text' | 'transaction' | 'report' | 'clarification' | 'admin'
 }
 
-// Per-user usage stats (for the Overview tab)
+// ─── Notifications ──────────────────────────────────────────────────────────
+
+export type NotificationSeverity = 'info' | 'warning' | 'error' | 'success'
+export type NotificationType = 'user_reply' | 'system_alert' | 'sent_message'
+
+export interface AdminNotification {
+  id: string
+  type: NotificationType
+  severity: NotificationSeverity
+  title: string
+  body: string
+  timestamp: Date
+  read: boolean
+  // for user_reply and sent_message
+  userId?: string
+  userName?: string
+  userTelegramUsername?: string
+  // for system_alert
+  service?: string
+  errorCode?: string
+  // for sent_message — original message the admin sent
+  adminMessage?: string
+}
+
+// ─── Per-user usage stats (for the Overview tab)
 export interface UserUsageStats {
   avgTransactionsPerWeek: number
   mostActiveHour: number       // 0–23
