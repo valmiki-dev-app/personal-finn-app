@@ -1,9 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { motion } from 'framer-motion'
 import { ActivityFeed } from '../shared/activity-feed'
-import { ChartContainer } from '../shared/chart-container'
 import { type Activity } from '@/lib/admin/admin-types'
 import { ArrowRight } from 'lucide-react'
 
@@ -13,28 +11,21 @@ interface ActivitySectionProps {
 
 export function ActivitySection({ activities }: ActivitySectionProps) {
   return (
-    <ChartContainer
-      title="Live Activity"
-      description="Recent user interactions and events"
-      delay={0.4}
-    >
-      <div className="flex flex-col h-full">
-        <ActivityFeed activities={activities} maxItems={8} />
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="mt-4 pt-4 border-t border-border/50"
+    <div className="bg-card rounded-xl border border-border p-5">
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h3 className="text-sm font-semibold text-foreground">Live Activity</h3>
+          <p className="text-xs text-muted-foreground mt-0.5">Recent user interactions</p>
+        </div>
+        <Link
+          href="/admin/events"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors"
         >
-          <Link
-            href="/admin/events"
-            className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
-          >
-            View all events
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </motion.div>
+          View all
+          <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
       </div>
-    </ChartContainer>
+      <ActivityFeed activities={activities} maxItems={8} />
+    </div>
   )
 }

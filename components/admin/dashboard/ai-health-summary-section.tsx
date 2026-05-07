@@ -1,74 +1,93 @@
 'use client'
 
-import { motion } from 'framer-motion'
-import { ChartContainer } from '../shared/chart-container'
 import { type AIMetrics } from '@/lib/admin/admin-types'
-import { Zap, AlertCircle, CheckCircle, BarChart3 } from 'lucide-react'
+import { CheckCircle, AlertCircle, RefreshCw, Zap } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface AIHealthSummarySectionProps {
   metrics: AIMetrics
 }
 
-export function AIHealthSummarySection({ metrics }: AIHealthSummarySectionProps) {
-  const stats = [
-    {
-      label: 'Parse Success Rate',
-      value: `${metrics.parseSuccessRate}%`,
-      icon: CheckCircle,
-      color: 'text-income',
-      bgColor: 'bg-income/10',
-    },
-    {
-      label: 'Clarification Rate',
-      value: `${metrics.clarificationRate}%`,
-      icon: AlertCircle,
-      color: 'text-primary',
-      bgColor: 'bg-primary/10',
-    },
-    {
-      label: 'Manual Correction',
-      value: `${metrics.manualCorrectionRate}%`,
-      icon: BarChart3,
-      color: 'text-gold',
-      bgColor: 'bg-gold/10',
-    },
-    {
-      label: 'Avg Confidence',
-      value: `${(metrics.averageConfidenceScore * 100).toFixed(0)}%`,
-      icon: Zap,
-      color: 'text-foreground',
-      bgColor: 'bg-primary/10',
-    },
-  ]
+interface StatRowProps {
+  label: string
+  value: string
+  icon: React.ComponentType<{ className?: string }>
+  color: string
+  bg: string
+  barColor: string
+  barValue: number
+}
 
+function StatRow({ label, value, icon: Icon, color, bg, barColor, barValue }: StatRowProps) {
   return (
-    <ChartContainer
-      title="AI Health Summary"
-      description={`${metrics.todayParseCount} parses today, ${metrics.todayFailedCount} failures`}
-      delay={0.6}
-    >
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((stat, index) => {
-          const Icon = stat.icon
-          return (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 + index * 0.05 }}
-              className="p-4 rounded-lg bg-muted/50 border border-border/50"
-            >
-              <div className="flex items-center gap-3 mb-2">
-                <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${stat.bgColor}`}>
-                  <Icon className={`h-4 w-4 ${stat.color}`} />
-                </div>
-              </div>
-              <p className="text-sm font-medium text-muted-foreground mb-1">{stat.label}</p>
-              <p className="text-2xl font-bold text-foreground">{stat.value}</p>
-            </motion.div>
-          )
-        })}
+    <div className="flex items-center gap-3">
+      <div className={cn('flex h-7 w-7 items-center justify-center rounded-lg flex-shrink-0', bg)}>
+        <Icon className={cn('h-3.5 w-3.5', color)} />
       </div>
-    </ChartContainer>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-xs text-muted-foreground">{label}</span>
+          <span className={cn('text-xs font-semibold', color)}>{value}</span>
+        </div>
+        <div className="h-1 bg-muted rounded-full overflow-hidden">
+          <div
+            className={cn('h-full rounded-full transition-all duration-700', barColor)}
+            style={{ width: `${barValue}%` }}
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export function AIHealthSummarySection({ metrics }: AIHealthSummarySectionProps) {
+  return (
+    <div className="bg-card rounded-xl border border-border p-5 h-full">
+      <div className="mb-4">
+        <h3 className="text-sm font-semibold text-foreground">AI Health</h3>
+        <p className="text-xs text-muted-foreground mt-0.5">
+          {metrics.todayParseCount.toLocaleString()} parses today &middot; {metrics.todayFailedCount} failed
+        </p>
+      </div>
+
+      <div className="space-y-4">
+        <StatRow
+          label="Parse success"
+          value={`${metrics.parseSuccessRate}%`}
+          icon={CheckCircle}
+          color="text-income"
+          bg="bg-income/10"
+          barColor="bg-income"
+          barValue={metrics.parseSuccessRate}
+        />
+        <StatRow
+          label="Clarification rate"
+          value={`${metrics.clarificationRate}%`}
+          icon={AlertCircle}
+          color="text-primary"
+          bg="bg-primary/10"
+          barColor="bg-primary"
+          barValue={metrics.clarificationRate * 10}
+        />
+        <StatRow
+          label="Manual correction"
+          value={`${metrics.manualCorrectionRate}%`}
+          icon={RefreshCw}
+          color="text-gold"
+          bg="bg-gold/10"
+          barColor="bg-gold"
+          barValue={metrics.manualCorrectionRate * 10}
+        />
+        <StatRow
+          label="Avg confidence"
+          value={`${(metrics.averageConfidenceScore * 100).toFixed(0)}%`}
+          icon={Zap}
+          color="text-foreground"
+          bg="bg-muted"
+          barColor="bg-foreground/40"
+          barValue={metrics.averageConfidenceScore * 100}
+        />
+      </div>
+    </div>
   )
 }

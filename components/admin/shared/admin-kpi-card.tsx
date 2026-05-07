@@ -3,7 +3,6 @@
 import { motion } from 'framer-motion'
 import { TrendingUp, TrendingDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { getChangeColor } from '@/lib/admin/admin-utils'
 
 interface AdminKPICardProps {
   title: string
@@ -14,7 +13,6 @@ interface AdminKPICardProps {
   icon?: React.ReactNode
   className?: string
   delay?: number
-  trend?: 'up' | 'down' | 'neutral'
 }
 
 export function AdminKPICard({
@@ -26,97 +24,55 @@ export function AdminKPICard({
   icon,
   className,
   delay = 0,
-  trend,
 }: AdminKPICardProps) {
-  const isPositiveChange = change && change > 0
+  const isUp = typeof change === 'number' && change > 0
+  const isDown = typeof change === 'number' && change < 0
 
-  const typeStyles = {
-    default: 'text-foreground',
-    positive: 'text-income',
-    negative: 'text-expense',
-    neutral: 'text-muted-foreground',
+  const iconBg = {
+    default: 'bg-primary/10 text-primary',
+    positive: 'bg-income/10 text-income',
+    negative: 'bg-expense/10 text-expense',
+    neutral: 'bg-muted text-muted-foreground',
   }
 
-  const iconBgStyles = {
-    default: 'bg-primary/10',
-    positive: 'bg-income/10',
-    negative: 'bg-expense/10',
-    neutral: 'bg-muted',
-  }
-
-  const iconColorStyles = {
-    default: 'text-primary',
-    positive: 'text-income',
-    negative: 'text-expense',
-    neutral: 'text-muted-foreground',
-  }
+  const changeColor = isUp ? 'text-income' : isDown ? 'text-expense' : 'text-muted-foreground'
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay }}
-      whileHover={{ y: -4 }}
+      transition={{ duration: 0.35, delay, ease: 'easeOut' }}
       className={cn(
-        'bg-card rounded-2xl p-6 border border-border/50 transition-shadow hover:shadow-md',
+        'bg-card rounded-xl border border-border p-5',
         className
       )}
     >
-      <div className="flex items-start justify-between">
-        <div className="flex-1">
-          <p className="text-sm font-medium text-muted-foreground mb-2">{title}</p>
-          <p className={cn('text-3xl font-bold tracking-tight', typeStyles[type])}>
-            {value}
-          </p>
-
-          {change !== undefined && (
-            <div className="flex items-center gap-2 mt-3">
-              <div className="flex items-center gap-1">
-                {isPositiveChange ? (
-                  <TrendingUp className="h-4 w-4 text-income" />
-                ) : (
-                  <TrendingDown className="h-4 w-4 text-expense" />
-                )}
-                <span className={cn('text-sm font-semibold', getChangeColor(change))}>
-                  {isPositiveChange ? '+' : '−'}
-                  {Math.abs(change)}
-                  {typeof value === 'string' && value.includes('%') ? '%' : ''}
-                </span>
-              </div>
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-medium text-muted-foreground truncate">{title}</p>
+          <p className="text-2xl font-bold text-foreground mt-1 tracking-tight">{value}</p>
+          {typeof change === 'number' && (
+            <div className="flex items-center gap-1 mt-2">
+              {isUp ? (
+                <TrendingUp className={cn('h-3.5 w-3.5', changeColor)} />
+              ) : isDown ? (
+                <TrendingDown className={cn('h-3.5 w-3.5', changeColor)} />
+              ) : null}
+              <span className={cn('text-xs font-medium', changeColor)}>
+                {isUp ? '+' : ''}{change}
+              </span>
               {changeLabel && (
                 <span className="text-xs text-muted-foreground">{changeLabel}</span>
               )}
             </div>
           )}
         </div>
-
         {icon && (
-          <div
-            className={cn(
-              'flex h-12 w-12 items-center justify-center rounded-xl flex-shrink-0',
-              iconBgStyles[type]
-            )}
-          >
-            <div className={cn(iconColorStyles[type])}>{icon}</div>
+          <div className={cn('flex h-9 w-9 items-center justify-center rounded-lg flex-shrink-0', iconBg[type])}>
+            {icon}
           </div>
         )}
       </div>
-
-      {trend && (
-        <div className="mt-4 h-1 bg-border rounded-full overflow-hidden">
-          <motion.div
-            initial={{ width: '0%' }}
-            animate={{
-              width: trend === 'up' ? '100%' : trend === 'down' ? '40%' : '70%',
-            }}
-            transition={{ duration: 0.8, ease: 'easeOut' }}
-            className={cn(
-              'h-full rounded-full',
-              trend === 'up' ? 'bg-income' : trend === 'down' ? 'bg-expense' : 'bg-primary'
-            )}
-          />
-        </div>
-      )}
     </motion.div>
   )
 }

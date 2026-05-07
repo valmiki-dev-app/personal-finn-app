@@ -5,49 +5,62 @@ import { motion } from 'framer-motion'
 import { type AdminUser } from '@/lib/admin/admin-types'
 import { StatusBadge } from '../shared/status-badge'
 import { formatRelativeTime } from '@/lib/admin/admin-utils'
-import { ArrowRight, Mail, Calendar, Activity } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface UsersTableProps {
   users: AdminUser[]
 }
 
+const activityColors = {
+  high: 'text-income',
+  medium: 'text-gold',
+  low: 'text-expense',
+}
+
+const activityLabels = {
+  high: 'High',
+  medium: 'Medium',
+  low: 'Low',
+}
+
 export function UsersTable({ users }: UsersTableProps) {
+  if (users.length === 0) {
+    return (
+      <div className="bg-card rounded-xl border border-border py-12 text-center">
+        <p className="text-sm text-muted-foreground">No users match your filters</p>
+      </div>
+    )
+  }
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      className="bg-card rounded-2xl border border-border/50 overflow-hidden"
-    >
-      {/* Table Header */}
-      <div className="sticky top-0 bg-muted/50 border-b border-border/50">
-        <div className="grid grid-cols-12 gap-4 px-6 py-4 text-sm font-semibold text-muted-foreground">
-          <div className="col-span-3">User</div>
-          <div className="col-span-2">Joined</div>
-          <div className="col-span-2">Last Active</div>
-          <div className="col-span-2">Transactions</div>
-          <div className="col-span-2">Status</div>
-          <div className="col-span-1"></div>
-        </div>
+    <div className="bg-card rounded-xl border border-border overflow-hidden">
+      {/* Header */}
+      <div className="grid grid-cols-[2fr_1fr_1fr_80px_120px_32px] gap-4 px-5 py-3 border-b border-border bg-muted/30">
+        <div className="text-xs font-medium text-muted-foreground">User</div>
+        <div className="text-xs font-medium text-muted-foreground">Joined</div>
+        <div className="text-xs font-medium text-muted-foreground">Last active</div>
+        <div className="text-xs font-medium text-muted-foreground">Txns</div>
+        <div className="text-xs font-medium text-muted-foreground">Status</div>
+        <div />
       </div>
 
-      {/* Table Body */}
-      <div className="divide-y divide-border/50">
+      {/* Rows */}
+      <div className="divide-y divide-border">
         {users.map((user, index) => (
           <motion.div
             key={user.id}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: index * 0.05 }}
-            className="hover:bg-muted/30 transition-colors group"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: index * 0.03 }}
           >
             <Link
               href={`/admin/users/${user.id}`}
-              className="grid grid-cols-12 gap-4 px-6 py-4 items-center"
+              className="grid grid-cols-[2fr_1fr_1fr_80px_120px_32px] gap-4 px-5 py-3.5 items-center hover:bg-muted/30 transition-colors group"
             >
-              {/* User Info */}
-              <div className="col-span-3 flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold flex-shrink-0">
+              {/* User */}
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary flex-shrink-0">
                   {user.avatar || user.name.charAt(0)}
                 </div>
                 <div className="min-w-0">
@@ -56,45 +69,37 @@ export function UsersTable({ users }: UsersTableProps) {
                 </div>
               </div>
 
-              {/* Join Date */}
-              <div className="col-span-2 text-sm text-foreground">
+              {/* Joined */}
+              <div className="text-sm text-foreground">
                 {new Date(user.joinDate).toLocaleDateString('ru-RU', {
                   day: 'numeric',
                   month: 'short',
                 })}
               </div>
 
-              {/* Last Active */}
-              <div className="col-span-2 text-sm text-muted-foreground">
+              {/* Last active */}
+              <div className="text-sm text-muted-foreground">
                 {formatRelativeTime(user.lastActive)}
               </div>
 
-              {/* Transaction Count */}
-              <div className="col-span-2 text-sm font-medium text-foreground">
+              {/* Transactions */}
+              <div className="text-sm font-medium text-foreground">
                 {user.transactionCount}
               </div>
 
-              {/* Status Badge */}
-              <div className="col-span-2">
+              {/* Status */}
+              <div>
                 <StatusBadge status={user.retentionStatus} />
               </div>
 
-              {/* Action */}
-              <div className="col-span-1 flex justify-end">
-                <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+              {/* Chevron */}
+              <div className="flex justify-end">
+                <ChevronRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors" />
               </div>
             </Link>
           </motion.div>
         ))}
       </div>
-
-      {/* Empty State */}
-      {users.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-12">
-          <Mail className="h-8 w-8 text-muted-foreground/50 mb-2" />
-          <p className="text-sm text-muted-foreground">No users found</p>
-        </div>
-      )}
-    </motion.div>
+    </div>
   )
 }

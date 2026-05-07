@@ -2,71 +2,100 @@
 
 import { cn } from '@/lib/utils'
 
+type StatusValue =
+  | 'active'
+  | 'at_risk'
+  | 'churned'
+  | 'operational'
+  | 'degraded'
+  | 'down'
+  | 'free'
+  | 'trial'
+  | 'premium'
+
 interface StatusBadgeProps {
-  status: 'active' | 'at_risk' | 'churned' | 'operational' | 'degraded' | 'down' | 'free' | 'trial' | 'premium'
+  status: StatusValue
   label?: string
   className?: string
 }
 
-const statusConfig = {
-  // Retention statuses
+const statusConfig: Record<StatusValue, { label: string; dot: string; text: string; bg: string }> = {
   active: {
     label: 'Active',
-    className: 'bg-income/10 text-income border border-income/20',
+    dot: 'bg-income',
+    text: 'text-income',
+    bg: 'bg-income/10',
   },
   at_risk: {
     label: 'At Risk',
-    className: 'bg-gold/10 text-gold border border-gold/20',
+    dot: 'bg-gold',
+    text: 'text-gold',
+    bg: 'bg-gold/10',
   },
   churned: {
     label: 'Churned',
-    className: 'bg-expense/10 text-expense border border-expense/20',
+    dot: 'bg-expense',
+    text: 'text-expense',
+    bg: 'bg-expense/10',
   },
-  // System statuses
   operational: {
     label: 'Operational',
-    className: 'bg-income/10 text-income border border-income/20',
+    dot: 'bg-income',
+    text: 'text-income',
+    bg: 'bg-income/10',
   },
   degraded: {
     label: 'Degraded',
-    className: 'bg-gold/10 text-gold border border-gold/20',
+    dot: 'bg-gold',
+    text: 'text-gold',
+    bg: 'bg-gold/10',
   },
   down: {
     label: 'Down',
-    className: 'bg-expense/10 text-expense border border-expense/20',
+    dot: 'bg-expense',
+    text: 'text-expense',
+    bg: 'bg-expense/10',
   },
-  // Subscription statuses
   free: {
     label: 'Free',
-    className: 'bg-muted text-muted-foreground border border-border',
+    dot: 'bg-muted-foreground',
+    text: 'text-muted-foreground',
+    bg: 'bg-muted',
   },
   trial: {
     label: 'Trial',
-    className: 'bg-primary/10 text-primary border border-primary/20',
+    dot: 'bg-primary',
+    text: 'text-primary',
+    bg: 'bg-primary/10',
   },
   premium: {
     label: 'Premium',
-    className: 'bg-income/10 text-income border border-income/20',
+    dot: 'bg-gold',
+    text: 'text-gold',
+    bg: 'bg-gold/10',
   },
 }
 
-export function StatusBadge({
-  status,
-  label,
-  className,
-}: StatusBadgeProps) {
+export function StatusBadge({ status, label, className }: StatusBadgeProps) {
   const config = statusConfig[status]
-
   return (
     <span
       className={cn(
-        'inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium transition-colors',
-        config.className,
+        'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium',
+        config.bg,
+        config.text,
         className
       )}
     >
-      <span className="w-2 h-2 rounded-full mr-2 animate-pulse" />
-      {label || config.label}
+      <span
+        className={cn(
+          'w-1.5 h-1.5 rounded-full flex-shrink-0',
+          config.dot,
+          // Only pulse for live statuses
+          status === 'active' || status === 'operational' ? 'animate-pulse' : ''
+        )}
+      />
+      {label ?? config.label}
     </span>
   )
 }

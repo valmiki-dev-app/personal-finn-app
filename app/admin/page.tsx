@@ -13,39 +13,27 @@ import {
 } from '@/lib/admin/admin-mock-data'
 
 export default function AdminDashboardPage() {
-  // Calculate retention rates from activity data
-  const d1Retention = 72
-  const d7Retention = 62
-  const d30Retention = 45
-
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Page Header */}
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
-        <p className="text-muted-foreground mt-1">
-          Monitor product health and user engagement in real-time
+        <h1 className="text-xl font-bold text-foreground">Overview</h1>
+        <p className="text-sm text-muted-foreground mt-0.5">
+          Product health and user engagement
         </p>
       </div>
 
-      {/* KPI Cards */}
+      {/* KPI Cards — 2 cols on mobile, 3 on desktop */}
       <KPISection metrics={kpiMetrics} />
 
-      {/* Retention Overview */}
-      <RetentionOverviewSection
-        d1={d1Retention}
-        d7={d7Retention}
-        d30={d30Retention}
-      />
+      {/* Retention row */}
+      <RetentionOverviewSection d1={72} d7={62} d30={45} />
 
-      {/* Two Column Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Product Insights - Takes 2 columns */}
+      {/* Middle row: Insights (2/3) + AI Health (1/3) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <div className="lg:col-span-2">
           <ProductInsightsSection insights={productInsights} />
         </div>
-
-        {/* AI Health Summary - Takes 1 column */}
         <div className="lg:col-span-1">
           <AIHealthSummarySection metrics={aiMetrics} />
         </div>

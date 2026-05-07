@@ -24,7 +24,6 @@ const navItems = [
   { href: '/transactions', label: 'Транзакции', icon: ArrowRightLeft },
   { href: '/analytics', label: 'Аналитика', icon: BarChart3 },
   { href: '/settings', label: 'Настройки', icon: Settings },
-  { href: '/admin', label: 'Admin Panel', icon: Shield },
 ]
 
 export function Sidebar({ collapsed, onToggle }: SidebarProps) {
@@ -77,7 +76,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       </nav>
 
       {/* Telegram Status */}
-      <div className="p-4 mx-3 mb-4 bg-muted rounded-xl">
+      <div className="p-4 mx-3 bg-muted rounded-xl">
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#229ED9]/10">
             <MessageCircle className="h-4 w-4 text-[#229ED9]" />
@@ -90,6 +89,17 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
             </p>
           </div>
         </div>
+      </div>
+
+      {/* Admin link */}
+      <div className="px-3 pb-4 pt-2">
+        <Link
+          href="/admin"
+          className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-all duration-200"
+        >
+          <Shield className="h-4 w-4 flex-shrink-0" />
+          <span>Admin Panel</span>
+        </Link>
       </div>
     </aside>
   )
